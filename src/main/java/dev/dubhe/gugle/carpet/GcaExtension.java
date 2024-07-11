@@ -52,11 +52,55 @@ public class GcaExtension implements CarpetExtension, ModInitializer {
     @Override
     public void onPlayerLoggedIn(ServerPlayer player) {
         GcaExtension.fakePlayerInventoryContainerMap.put(player, new FakePlayerInventoryContainer(player));
+
+        if (GcaSetting.fakePlayerResident) {
+            JsonObject fakePlayerList = new JsonObject();
+            fakePlayerInventoryContainerMap.forEach((vplayer, fakePlayerInventoryContainer) -> {
+                if (!(vplayer instanceof EntityPlayerMPFake)) return;
+                String username = vplayer.getName().getString();
+                fakePlayerList.add(username, FakePlayerResident.save(vplayer));
+            });
+            File file = CarpetServer.minecraft_server.getWorldPath(LevelResource.ROOT).resolve("fake_player.gca.json").toFile();
+            if (!file.isFile()) {
+                try {
+                    file.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            try (BufferedWriter bfw = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)) {
+                bfw.write(new Gson().toJson(fakePlayerList));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
     public void onPlayerLoggedOut(ServerPlayer player) {
         GcaExtension.fakePlayerInventoryContainerMap.remove(player);
+
+        if (GcaSetting.fakePlayerResident) {
+            JsonObject fakePlayerList = new JsonObject();
+            fakePlayerInventoryContainerMap.forEach((vplayer, fakePlayerInventoryContainer) -> {
+                if (!(vplayer instanceof EntityPlayerMPFake)) return;
+                String username = vplayer.getName().getString();
+                fakePlayerList.add(username, FakePlayerResident.save(vplayer));
+            });
+            File file = CarpetServer.minecraft_server.getWorldPath(LevelResource.ROOT).resolve("fake_player.gca.json").toFile();
+            if (!file.isFile()) {
+                try {
+                    file.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            try (BufferedWriter bfw = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)) {
+                bfw.write(new Gson().toJson(fakePlayerList));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
