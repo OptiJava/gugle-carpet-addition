@@ -2,12 +2,6 @@ name: Build Mod
 
 on:
   push:
-    branches: [ '1.19.x' ]
-    paths:
-      - src/**
-      - build.gradle
-      - gradle.properties
-      - settings.gradle
 
 jobs:
   build:
